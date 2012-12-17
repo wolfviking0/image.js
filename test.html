@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+	    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	    
+	  <style>
+      		.emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
+	    	textarea.emscripten { font-family: monospace; width: 100%; }
+	    	.example{padding:10px;border:1px solid #ccc}#drop_zone{border:2px dashed #bbb;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;padding:25px;text-align:center;font:20pt bold,"Vollkorn";color:#bbb}.thumb{height:75px;border:1px solid #000;margin:10px 5px 0 0}#progress_bar{margin:10px 0;padding:3px;border:1px solid #000;font-size:14px;clear:both;opacity:0;-o-transition:opacity 1s linear;-moz-transition:opacity 1s linear;-webkit-transition:opacity 1s linear;-ms-transition:opacity 1s linear}#progress_bar.loading{opacity:1}#progress_bar .percent{background-color:#9cf;height:auto;width:0}#byte_content{margin:5px 0;max-height:100px;overflow-y:auto;overflow-x:hidden}#byte_range{margin-top:5px}
+	    </style>
+	</head>
+	<body>
+	    <script src="libimage.js"></script>
+	    
+	    <h1>libimage.js (PNG/JPG/WEBP)</h1>
+		
+	    <div class="example">
+			<div id="drop_zone">Drop image file here</div>
+			<output id="list"></output>
+			<canvas id="canvaszone"></canvas>
+		</div>
+		<textarea class="emscripten" id="output" rows="25"></textarea>
+		<script>
+		  	if (typeof Module == 'undefined') Module = {};
+		  		            
+			function handleFileSelect(evt) {
+    			evt.stopPropagation();
+    			evt.preventDefault();
+
+				var begin = new Date();
+
+    			var files = evt.dataTransfer.files; // FileList object.
+
+    			// files is a FileList of File objects. List some properties.
+   				var output = [];
+		
+				var file = files[0];
+      				
+				var reader = new FileReader();
+					
+				reader.onloadend = function(evt) {
+ 					if (evt.target.readyState == FileReader.DONE) { // DONE == 2
+						
+						var datapng = loadImage(file.name,evt.target.result);
+											                     	 
+                       	var canvas = document.getElementById("canvaszone");
+						canvas.width = datapng.width;
+				        canvas.height = datapng.height;
+				        
+				        var context = canvas.getContext("2d");
+                       	
+                       	var tmpImgData = context.getImageData(0, 0, datapng.width, datapng.height);
+                       	var tmpImgDataPixels = tmpImgData.data;
+                       	
+				        var data = datapng.raw;
+  	
+        				if ('set' in tmpImgDataPixels && datapng.format == 4) {
+							tmpImgDataPixels.set(data);
+						} else {
+							var ii = 0;
+							for (var i = 0; i < tmpImgDataPixels.length; i+=4) {
+									tmpImgDataPixels[i] = data[ii++];
+									tmpImgDataPixels[i+1] = data[ii++];
+									tmpImgDataPixels[i+2] = data[ii++];
+									if (datapng.format == 3) {
+										tmpImgDataPixels[i+3] = 255;
+									} else {
+										tmpImgDataPixels[i+3] = data[ii++];
+									}
+							}
+						}
+
+                       	context.putImageData(tmpImgData, 0, 0);
+                       	
+                       	var end = new Date();
+						var elapsed = new Date();
+                       	elapsed.setTime(end.getTime() - begin.getTime())
+                       	                       	           	
+      					output.push('<li><strong>', escape(file.name), '</strong> (', file.type || 'n/a', ') - ',
+                 			file.size, ' bytes, last modified: ',
+                 			file.lastModifiedDate ? file.lastModifiedDate.toLocaleDateString() : 'n/a',
+                 			', ' + elapsed.getMilliseconds() + ' ms',
+                 			'</br>',
+                 			datapng.width,'*',datapng.height,'*',datapng.format,
+                 			'</br>',
+                 			'</li>');
+
+   			    		document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+			    		
+   			    		
+       				 }
+      			};
+					
+    			var blob = file.slice(0, file.size - 1);
+    			reader.readAsBinaryString(blob);
+  			}
+
+  			function handleDragOver(evt) {
+    			evt.stopPropagation();
+    			evt.preventDefault();
+    			evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+  			}
+
+  			// Setup the dnd listeners.
+  			var dropZone = document.getElementById('drop_zone');
+  			dropZone.addEventListener('dragover', handleDragOver, false);
+  			dropZone.addEventListener('drop', handleFileSelect, false);
+		</script>
+	</body>
+</html>
