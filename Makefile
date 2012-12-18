@@ -14,7 +14,7 @@ LIBZSRCC = 	libz/adler32.c\
 			libz/uncompr.c\
 			libz/zutil.c
 			
-# Version 1.5.13
+# Version 1.5.2
 PNGSRCC = 	libpng/png.c\
 			libpng/pngerror.c\
 			libpng/pngget.c\
@@ -31,7 +31,7 @@ PNGSRCC = 	libpng/png.c\
 			libpng/pngwtran.c\
 			libpng/pngwutil.c
 			
-# Version 8b
+# Version 6b
 JPGSRCC =  	libjpeg/jcomapi.c\
 			libjpeg/jutils.c\
 			libjpeg/jerror.c\
@@ -114,6 +114,7 @@ INCLUDES = \
 	-I./libpng\
 	-I./libz\
 	-I./libwebp/src\
+	-I./libwebp/src\utils\
 	-I$(EMSCRIPTEN)/system/include\
 	
 DEFINES = \
@@ -124,5 +125,5 @@ DEFINES = \
 all: 
 	$(CXX) $(LIBZSRCC) $(JPGSRCC) $(PNGSRCC) $(WEBPSRCC) $(INCLUDES) $(DEFINES) -o externs.js.o
 	$(CXX) $(MAINSRCC) $(INCLUDES) $(DEFINES) -o image.js.o
-	EMCC_DEBUG=1 $(CXX) -O2 *.o --clean_cache -s EXPORTED_FUNCTIONS="['_main', '_malloc', '_free', '_width', '_height', '_format']" -o libimage.raw.js --pre-js pre.js
+	EMCC_DEBUG=1 $(CXX) -O2 *.o --clean_cache -s EXPORTED_FUNCTIONS="['_main', '_malloc', '_free', '_width', '_height', '_format']" -o libimage.raw.js --pre-js pre.js -s ALLOW_MEMORY_GROWTH=1
 	rm -f *.o

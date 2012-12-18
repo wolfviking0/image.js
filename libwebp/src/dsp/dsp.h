@@ -20,7 +20,7 @@ extern "C" {
 
 //------------------------------------------------------------------------------
 // CPU detection
-
+#ifdef USE_SSE
 #if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86))
 #define WEBP_MSC_SSE2  // Visual C++ SSE2 targets
 #endif
@@ -28,7 +28,8 @@ extern "C" {
 #if defined(__SSE2__) || defined(WEBP_MSC_SSE2)
 #define WEBP_USE_SSE2
 #endif
-
+#endif
+#ifdef USE_NEON
 #if defined(__ANDROID__) && defined(__ARM_ARCH_7A__)
 #define WEBP_ANDROID_NEON  // Android targets that might support NEON
 #endif
@@ -36,7 +37,7 @@ extern "C" {
 #if defined(__ARM_NEON__) || defined(WEBP_ANDROID_NEON)
 #define WEBP_USE_NEON
 #endif
-
+#endif
 typedef enum {
   kSSE2,
   kSSE3,

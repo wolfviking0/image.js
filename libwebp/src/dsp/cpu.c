@@ -19,6 +19,7 @@
 extern "C" {
 #endif
 
+#ifdef USE_SSE
 //------------------------------------------------------------------------------
 // SSE2 detection.
 //
@@ -76,6 +77,10 @@ static int armCPUInfo(CPUFeature feature) {
   return 1;
 }
 VP8CPUInfo VP8GetCPUInfo = armCPUInfo;
+#else
+VP8CPUInfo VP8GetCPUInfo = NULL;
+#endif
+
 #else
 VP8CPUInfo VP8GetCPUInfo = NULL;
 #endif

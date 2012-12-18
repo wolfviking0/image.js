@@ -8,19 +8,98 @@
       		.emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
 	    	textarea.emscripten { font-family: monospace; width: 100%; }
 	    	.example{padding:10px;border:1px solid #ccc}#drop_zone{border:2px dashed #bbb;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;padding:25px;text-align:center;font:20pt bold,"Vollkorn";color:#bbb}.thumb{height:75px;border:1px solid #000;margin:10px 5px 0 0}#progress_bar{margin:10px 0;padding:3px;border:1px solid #000;font-size:14px;clear:both;opacity:0;-o-transition:opacity 1s linear;-moz-transition:opacity 1s linear;-webkit-transition:opacity 1s linear;-ms-transition:opacity 1s linear}#progress_bar.loading{opacity:1}#progress_bar .percent{background-color:#9cf;height:auto;width:0}#byte_content{margin:5px 0;max-height:100px;overflow-y:auto;overflow-x:hidden}#byte_range{margin-top:5px}
+			.thumb {
+    			height: 75px;
+ 				border: 1px solid #000;
+    			margin: 10px 5px 0 0;
+  			}
 	    </style>
 	</head>
 	<body>
 	    <script src="libimage.js"></script>
 	    
-	    <h1>libimage.js (PNG/JPG/WEBP/TGA)</h1>
-		
+		<!--
 	    <div class="example">
 			<div id="drop_zone">Drop image file here</div>
 			<output id="list"></output>
 			<canvas id="canvaszone"></canvas>
 		</div>
+		-->
+		<div class="example">
+			<p>Try this example with a directory of images!</p>
+			<input type="file" id="files3" name="files3[]" multiple /><br>
+			<output id="list"></output>
+			<canvas id="canvaszone"></canvas>
+		</div>
+		<script>
+  			function handleFileSelect(evt) {
+	  			var begin = new Date();
+    			var file = evt.target.files[0]; // FileList object
+      			var reader = new FileReader();
+      			var output = [];
+
+      			// Closure to capture the file information.
+      			reader.onloadend = (function(theFile) {
+        			return function(e) {
+          				// Render thumbnail.
+          				var datapng = loadImage(theFile.name,e.target.result);
+          														                     	 
+                   		var canvas = document.getElementById("canvaszone");
+						canvas.width = datapng.width;
+				        canvas.height = datapng.height;
+					        
+				        var context = canvas.getContext("2d");
+                       	
+            	       	var tmpImgData = context.getImageData(0, 0, datapng.width, datapng.height);
+                       	var tmpImgDataPixels = tmpImgData.data;
+                      	
+				   	    var data = datapng.raw;
+  	
+        				if ('set' in tmpImgDataPixels && datapng.format == 4) {
+							tmpImgDataPixels.set(data);
+						} else {
+							var ii = 0;
+							for (var i = 0; i < tmpImgDataPixels.length; i+=4) {
+									tmpImgDataPixels[i] = data[ii++];
+									tmpImgDataPixels[i+1] = data[ii++];
+									tmpImgDataPixels[i+2] = data[ii++];
+									if (datapng.format == 3) {
+										tmpImgDataPixels[i+3] = 255;
+									} else {
+										tmpImgDataPixels[i+3] = data[ii++];
+									}
+							}
+						}
+
+            	       	context.putImageData(tmpImgData, 0, 0);
+                	       	
+                   	   	var end = new Date();
+						var elapsed = new Date();
+	                   	elapsed.setTime(end.getTime() - begin.getTime())
+                     	                       	           	
+    	  				output.push('<li><strong>', escape(theFile.name), '</strong> (', theFile.type || 'n/a', ') - ',
+        	      			theFile.size, ' bytes, last modified: ',
+            	  			theFile.lastModifiedDate ? theFile.lastModifiedDate.toLocaleDateString() : 'n/a',
+                 			', ' + elapsed.getMilliseconds() + ' ms',
+                			'</br>',
+                			datapng.width,'*',datapng.height,'*',datapng.format,
+                 			'</br>',
+	                		'</li>');
+	
+   				    	document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+          					
+    	    		};
+        					
+	     		})(file);	
+
+      			// Read in the image file as a data URL.
+      			reader.readAsBinaryString(file);
+  			}
+
+			document.getElementById('files3').addEventListener('change', handleFileSelect, false);
+		</script>
 		<textarea class="emscripten" id="output" rows="25"></textarea>
+		<!--
 		<script>
 		  	if (typeof Module == 'undefined') Module = {};
 		  		            
@@ -107,5 +186,6 @@
   			dropZone.addEventListener('dragover', handleDragOver, false);
   			dropZone.addEventListener('drop', handleFileSelect, false);
 		</script>
+		--!>
 	</body>
 </html>
