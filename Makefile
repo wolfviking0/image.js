@@ -125,5 +125,5 @@ DEFINES = \
 all: 
 	$(CXX) $(LIBZSRCC) $(JPGSRCC) $(PNGSRCC) $(WEBPSRCC) $(INCLUDES) $(DEFINES) -o externs.js.o
 	$(CXX) $(MAINSRCC) $(INCLUDES) $(DEFINES) -o image.js.o
-	EMCC_DEBUG=1 $(CXX) -O2 *.o --clean_cache -s EXPORTED_FUNCTIONS="['_main', '_malloc', '_free', '_width', '_height', '_format']" -o libimage.raw.js --pre-js pre.js -s ALLOW_MEMORY_GROWTH=1
+	EMCC_DEBUG=1 $(CXX) -O3 -s ASM_JS=1 *.o --clean_cache -s EXPORTED_FUNCTIONS="['_main', '_malloc', '_free', '_width', '_height', '_format']" -o libimage.raw.js --pre-js pre.js
 	rm -f *.o

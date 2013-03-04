@@ -14,9 +14,9 @@ int output_height;
 int output_format;
 
 extern "C" {
- 	int EMSCRIPTEN_KEEPALIVE width() { return output_width; };
- 	int EMSCRIPTEN_KEEPALIVE height() { return output_height; };
-    int EMSCRIPTEN_KEEPALIVE format() { return output_format; };
+ 	int width() { return output_width; };
+ 	int height() { return output_height; };
+    int format() { return output_format; };
 }
 
 /************************/

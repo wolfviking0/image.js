@@ -42,7 +42,7 @@
       			reader.onloadend = (function(theFile) {
         			return function(e) {
           				// Render thumbnail.
-          				var datapng = loadImage(theFile.name,e.target.result);
+          				var datapng = ImageJS.Decode(e.target.result,theFile.name);
           														                     	 
                    		var canvas = document.getElementById("canvaszone");
 						canvas.width = datapng.width;

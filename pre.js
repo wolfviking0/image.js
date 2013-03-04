@@ -1,8 +1,8 @@
 
 	Module['preRun'] = function() {
-		FS.createDataFile('/', Module['imagename'],Module['imagedata'], true, true);
+		FS.createDataFile('/', imagename,imagedata, true, true);
   	};
-  	Module.arguments = [Module['imagename']];
+  	Module.arguments = [imagename];
  	Module['return'] = function() {
  		// Like that i can found the equivalent with -O2 and closure
 		return FS.root.contents['image.raw'].contents;
